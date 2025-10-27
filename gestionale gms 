@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestionale GMS</title>
+<style>
+:root {
+  --arancio: #ff6a00;
+  --grigio: #333;
+  --chiaro: #f5f5f5;
+  --scuro: #1c1c1e;
+}
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--chiaro);
+  color: var(--grigio);
+  transition: background 0.3s, color 0.3s;
+}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--scuro);
+    color: #ddd;
+  }
+}
+
+/* Splash screen */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: var(--arancio);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeOut 1s ease forwards;
+  animation-delay: 2.5s;
+}
+#splash img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: white;
+  padding: 10px;
+  opacity: 0;
+  animation: fadeIn 1.5s ease forwards;
+}
+#splash p {
+  margin-top: 20px;
+  font-size: 18px;
+  opacity: 0;
+  animation: fadeInText 2s ease forwards;
+  animation-delay: 0.8s;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInText { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+/* Header */
+header {
+  background: var(--arancio);
+  color: white;
+  text-align: center;
+  padding: 10px 0;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+header img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  padding: 5px;
+}
+main { padding: 15px; max-width: 900px; margin: auto; }
+
+/* Menu e sezioni */
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+.menu button {
+  background: var(--arancio);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.menu button:hover { background: #e55f00; }
+.menu .danger { background: #b22; }
+section.sezione {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  background: rgba(255,255,255,0.8);
+}
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+input, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #aaa;
+}
+button { margin-top: 12px; }
+</style>
+</head>
+<body>
+<div id="splash">
+  <img src="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <circle cx='50' cy='50' r='48' fill='white'/>
+    <text x='50' y='58' text-anchor='middle' font-size='40' fill='%23ff6a00' font-family='Arial' font-weight='bold'>GMS</text>
+  </svg>" alt="Logo GMS">
+  <p>Avvio Gestionale GMS...</p>
+</div>
+
+<header>
+  <img src="data:image/svg+xml;utf8,
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <circle cx='50' cy='50' r='48' fill='white'/>
+    <text x='50' y='58' text-anchor='middle' font-size='40' fill='%23ff6a00' font-family='Arial' font-weight='bold'>GMS</text>
+  </svg>" alt="Logo GMS">
+  <span>Gestionale GMS</span>
+</header>
+
+<main>
+  <div class="menu">
+    <button onclick="mostraSezione('entrate')">Entrate</button>
+    <button onclick="mostraSezione('uscite')">Uscite</button>
+    <button onclick="mostraSezione('fisse')">Uscite fisse</button>
+    <button onclick="mostraSezione('dashboard')">Dashboard</button>
+    <button onclick="mostraSezione('export')">Esporta</button>
+    <button class="danger" onclick="cancellaDati()">🗑️ Cancella dati</button>
+  </div>
+
+  <section id="entrate" class="sezione">
+    <h2>Nuova Entrata</h2>
+    <label>Metodo:</label>
+    <select id="metodoEntrata"><option>Cash</option><option>POS</option><option>Bonifico</option></select>
+    <label>Prodotto o servizio:</label><input type="text" id="prodottoEntrata">
+    <label>Importo (€):</label><input type="number" id="importoEntrata" step="0.01">
+    <label>Data:</label><input type="date" id="dataEntrata">
+    <label>Descrizione:</label><input type="text" id="descrizioneEntrata">
+    <button onclick="salvaEntrata()">💾 Salva Entrata</button>
+  </section>
+
+  <section id="uscite" class="sezione" style="display:none;">
+    <h2>Nuova Uscita</h2>
+    <label>Metodo:</label><select id="metodoUscita"><option>Cash</option><option>Bonifico</option></select>
+    <label>Importo (€):</label><input type="number" id="importoUscita" step="0.01">
+    <label>Data:</label><input type="date" id="dataUscita">
+    <label>Descrizione:</label><input type="text" id="descrizioneUscita">
+    <button onclick="salvaUscita()">💾 Salva Uscita</button>
+  </section>
+
+  <section id="fisse" class="sezione" style="display:none;">
+    <h2>Uscite fisse</h2>
+    <label>Luce (€):</label><input type="number" id="luceFissa" step="0.01">
+    <label>Affitto (€):</label><input type="number" id="affittoFissa" step="0.01">
+    <label>Telefono (€):</label><input type="number" id="telefonoFissa" step="0.01">
+    <label>Stipendi (€):</label><input type="number" id="stipendiFissa" step="0.01">
+    <button onclick="salvaUsciteFisse()">💾 Salva Uscite Fisse</button>
+  </section>
+
+  <section id="dashboard" class="sezione" style="display:none;">
+    <h2>Dashboard</h2>
+    <canvas id="graficoContabile" height="200"></canvas>
+    <canvas id="graficoProdotti" height="200" style="margin-top:25px;"></canvas>
+  </section>
+
+  <section id="export" class="sezione" style="display:none;">
+    <h2>Esporta in Excel (CSV)</h2>
+    <button onclick="esportaCSV()">📤 Esporta dati</button>
+    <p id="messaggioExport"></p>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function mostraSezione(id){
+  document.querySelectorAll('.sezione').forEach(s=>s.style.display='none');
+  document.getElementById(id).style.display='block';
+  if(id==='dashboard') aggiornaDashboard();
+}
+function caricaDati(){return JSON.parse(localStorage.getItem('gmsData')||'{"entrate":[],"uscite":[],"fisse":{}}');}
+function salvaDati(d){localStorage.setItem('gmsData',JSON.stringify(d));}
+function salvaEntrata(){
+  const d=caricaDati();
+  d.entrate.push({
+    metodo:metodoEntrata.value,prodotto:prodottoEntrata.value,
+    importo:parseFloat(importoEntrata.value||0),data:dataEntrata.value,
+    descrizione:descrizioneEntrata.value});
+  salvaDati(d);alert("Entrata salvata ✅");
+  document.querySelectorAll('#entrate input').forEach(i=>i.value='');
+}
+function salvaUscita(){
+  const d=caricaDati();
+  d.uscite.push({metodo:metodoUscita.value,
+    importo:parseFloat(importoUscita.value||0),
+    data:dataUscita.value,descrizione:descrizioneUscita.value});
+  salvaDati(d);alert("Uscita salvata ✅");
+  document.querySelectorAll('#uscite input').forEach(i=>i.value='');
+}
+function salvaUsciteFisse(){
+  const d=caricaDati();
+  d.fisse={luce:+luceFissa.value||0,affitto:+affittoFissa.value||0,
+    telefono:+telefonoFissa.value||0,stipendi:+stipendiFissa.value||0};
+  salvaDati(d);alert("Uscite fisse salvate ✅");
+}
+function cancellaDati(){
+  if(confirm("Vuoi davvero cancellare tutti i dati?")){
+    localStorage.removeItem('gmsData');alert("Dati cancellati 🗑️");location.reload();
+  }
+}
+function aggiornaDashboard(){
+  const d=caricaDati();
+  const e=d.entrate.reduce((a,b)=>a+b.importo,0);
+  const u=d.uscite.reduce((a,b)=>a+b.importo,0);
+  const f=Object.values(d.fisse).reduce((a,b)=>a+(b||0),0);
+  const usciteTot=u+f;const s=e-usciteTot;
+  new Chart(graficoContabile,{type:'bar',
+    data:{labels:['Entrate','Uscite','Saldo'],
+    datasets:[{label:'€ Totali',data:[e,usciteTot,s],
+    backgroundColor:['#2ecc71','#e74c3c','#f39c12']}]},
+    options:{animation:{duration:1000}}});
+  const prod={};d.entrate.forEach(x=>{if(!x.prodotto)return;
+    prod[x.prodotto]=(prod[x.prodotto]||0)+1;});
+  new Chart(graficoProdotti,{type:'bar',
+    data:{labels:Object.keys(prod),
+    datasets:[{label:'Quantità vendute',data:Object.values(prod),
+    backgroundColor:'#3498db'}]},
+    options:{animation:{duration:1000},scales:{y:{beginAtZero:true}}}});
+}
+function esportaCSV(){
+  const d=caricaDati();let csv="Tipo,Metodo,Prodotto,Importo,Data,Descrizione\n";
+  d.entrate.forEach(e=>csv+=`Entrata,${e.metodo},${e.prodotto||""},${e.importo},${e.data},${e.descrizione||""}\n`);
+  d.uscite.forEach(u=>csv+=`Uscita,${u.metodo},,${u.importo},${u.data},${u.descrizione||""}\n`);
+  csv+="\nUscite fisse\n";for(const[k,v]of Object.entries(d.fisse)){csv+=`${k},,,${v}\n`;}
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='GestionaleGMS.csv';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  messaggioExport.innerText="✅ Esportazione completata (file CSV salvato)";
+}
+window.addEventListener('load',()=>{
+  setTimeout(()=>splash.style.display='none',3000);
+  mostraSezione('entrate');
+});
+</script>
+</body>
+</html>
